@@ -1,0 +1,34 @@
+version: '3.8' # Specifies the Docker Compose file format version
+
+services:
+ 
+ # Database service
+  db:
+    build:
+      context: ./Database
+      dockerfile: Dockerfile
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DB_PASS}"  # Use the environment variable from .env
+      MYSQL_DATABASE: "${DB_NAME}"      # Same here
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+ 
+ # web
+  web:
+    build:
+      context: ./Web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    environment:
+      - DB_HOST=db
+      - DB_USER
+      - DB_PASS
+      - DB_NAME
+    depends_on: # dependency, web depends on the database
+      - db
+
+volumes:
+  db_data:  # Persistent volume for the database
